@@ -1,14 +1,9 @@
 jQuery(function($) {
     'use strict';
 
-    function allGood() {
-
-    }
-
     var tabs = {
         '#requirements': function () {
-
-            var $requirements = $('#requirements .content'),
+            var $content = $('#requirements .content'),
                 $list = $('<ul class="list-unstyled"></ul>'),
                 requirements = [
                     {
@@ -55,20 +50,68 @@ jQuery(function($) {
                     });
             });
 
-            $requirements
+            $content
                 .empty()
                 .append($list);
+
+            $('#requirements a')
+                .removeClass('disabled');
         },
         '#composer-install': function () {
-            $.ajax({
-                url: 'scripts/composer.php',
-                dataType: 'json'
-            })
-                .always(function (response) {
+            var $content = $('#composer-install .content'),
+                $list = $(
+                '<ul class="list-unstyled"></ul>'),
+                steps = [
+                    {
+                        title: 'Downloading CakePHP framework', uri: 'scripts/createProject.php'
+                    }, {
+                        title: 'Downloading Croogo', uri: 'scripts/installCroogo.php'
+                    }
+                ];
 
-                });
+            steps.forEach(function (step)
+            {
+                var $listItem = $('<li></li>'),
+                    icon = $('<i class="fa fa-spin fa-spinner"></i>'),
+                    listContent = ' ' + step.title;
+
+                $listItem
+                    .append(icon)
+                    .append(listContent)
+                    .appendTo($list);
+                step.item = $listItem;
+                step.icon = icon;
+            });
+
+            $content
+                .empty()
+                .append($list);
+
+            steps.forEach(function (step)
+            {
+                $.ajaxQueue({
+                        url: step.uri
+                    })
+                    .done(function ()
+                    {
+                        step.icon
+                            .removeClass('fa-spin fa-spinner')
+                            .addClass('fa-check text-success');
+                    });
+
+            });
         }
     };
+
+    $('#tab-content')
+        .on('click', 'a[data-toggle="switch-tab"]', function (e)
+        {
+            e.preventDefault();
+            var href = $(this).attr('href');
+
+            $('#tab-buttons a[href="' + href + '"].nav-link').tab('show');
+        })
+        .find('a[data-toggle="switch-tab"]').addClass('disabled');
 
     $('#tab-buttons')
         .on('click', 'a[data-toggle="tab"]', function (e) {
@@ -80,13 +123,4 @@ jQuery(function($) {
             tabs[$(e.target).attr('href')]();
         })
         .find('a:first').tab('show');
-
-    $('#tab-content')
-        .on('click', 'a[data-toggle="switch-tab"]', function (e) {
-            e.preventDefault();
-            var href = $(this).attr('href');
-
-            $('#tab-buttons a[href="' + href + '"].nav-link').tab('show');
-        })
-        .find('a[data-toggle="switch-tab"]').addClass('disabled');
 });
