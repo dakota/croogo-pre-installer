@@ -1,2 +1,2 @@
 <?php
-header('Location: webroot/');
+header('Location: webroot/installer/');
