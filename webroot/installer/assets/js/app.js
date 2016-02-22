@@ -12,11 +12,11 @@ jQuery(function($) {
                 $list = $('<ul class="list-unstyled"></ul>'),
                 requirements = [
                     {
-                        title: 'PHP Version (5.5.9+, or 7.0.0+)', uri: 'installer/phpVersion.php'
+                        title: 'PHP Version (5.5.9+, or 7.0.0+)', uri: 'scripts/phpVersion.php'
                     }, {
-                        title: 'PHP extensions', uri: 'installer/phpExtensions.php'
+                        title: 'PHP extensions', uri: 'scripts/phpExtensions.php'
                     }, {
-                        title: 'Install directory is writable', uri: 'installer/writable.php'
+                        title: 'Install directory is writable', uri: 'scripts/writable.php'
                     }
                 ];
 
@@ -61,7 +61,7 @@ jQuery(function($) {
         },
         '#composer-install': function () {
             $.ajax({
-                url: 'installer/composer.php',
+                url: 'scripts/composer.php',
                 dataType: 'json'
             })
                 .always(function (response) {

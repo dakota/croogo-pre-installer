@@ -11,6 +11,7 @@ class ComposerOutput implements \Symfony\Component\Console\Output\OutputInterfac
      */
     public function write($messages, $newline = false, $options = 0)
     {
+        $messages = implode("", (array)$messages);
         echo $messages;
     }
 
@@ -22,6 +23,7 @@ class ComposerOutput implements \Symfony\Component\Console\Output\OutputInterfac
      */
     public function writeln($messages, $options = 0)
     {
+        $messages = implode("\n", (array)$messages);
         echo $messages;
     }
 

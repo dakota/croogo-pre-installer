@@ -11,7 +11,11 @@ function delTree($dir)
 }
 
 define('COMPOSER_DIR', sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'composer');
-define('PROJECT_DIR', sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'croogo');
+define('TMP_PROJECT_DIR', sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'croogo');
+
+if (is_dir(TMP_PROJECT_DIR)) {
+    delTree(TMP_PROJECT_DIR);
+}
 
 if (!file_exists(COMPOSER_DIR . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php') == true) {
     $composer = new Phar('../composer.phar', 0);
@@ -31,7 +35,7 @@ $input = new \Symfony\Component\Console\Input\ArrayInput([
     '--prefer-dist',
     '--no-interaction',
     'package' => 'cakephp/app',
-    'directory' => PROJECT_DIR,
+    'directory' => TMP_PROJECT_DIR,
 ]);
 $output = new ComposerOutput();
 
@@ -39,15 +43,23 @@ $application = new \Composer\Console\Application();
 $application->setAutoExit(false);
 $application->run($input, $output);
 
-$input = new \Symfony\Component\Console\Input\ArrayInput([
+$requireInput = [
     'command' => 'require',
-    '--stability' => 'dev',
     '--prefer-dist',
     '--no-interaction',
-    '--working-dir' => PROJECT_DIR,
-    'packages' => 'croogo/croogo 3.0.*@dev',
-]);
+    '--working-dir' => TMP_PROJECT_DIR,
+    'packages' => [
+        'cakephp/acl:dev-master@dev',
+        'cakedc/search:3.0.x@dev',
+        'admad/cakephp-sequence:dev-master@dev',
+        'croogo/croogo:3.0.x@dev'
+    ],
+];
+
+$input = new \Symfony\Component\Console\Input\ArrayInput($requireInput);
 $application->run($input, $output);
 
 delTree(COMPOSER_DIR);
+
+rename(TMP_PROJECT_DIR, dirname(dirname(dirname(__DIR__))));
 
