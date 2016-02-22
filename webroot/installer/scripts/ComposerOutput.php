@@ -1,4 +1,5 @@
 <?php
+include "ComposerFormatter.php";
 
 class ComposerOutput implements \Symfony\Component\Console\Output\OutputInterface
 {
