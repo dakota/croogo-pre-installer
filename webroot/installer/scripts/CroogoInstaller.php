@@ -91,31 +91,54 @@ class CroogoInstaller
         return $output->fetch();
     }
 
-    public function setMinimumStability()
+    protected function openComposerJson()
     {
         $composerFile = $this->installDir . DIRECTORY_SEPARATOR . 'composer.json';
-        $json = json_decode(file_get_contents($composerFile), true);
-        $json['minimum-stability'] = 'dev';
+        return json_decode(file_get_contents($composerFile), true);
+    }
+
+    protected function saveComposerJson($json)
+    {
+        $composerFile = $this->installDir . DIRECTORY_SEPARATOR . 'composer.json';
         file_put_contents($composerFile, json_encode($json, JSON_PRETTY_PRINT));
+    }
+
+    public function setMinimumStability()
+    {
+        $json = $this->openComposerJson();
+        $json['minimum-stability'] = 'dev';
+        $this->saveComposerJson($json);
     }
 
     public function addCroogoRequire()
     {
-        $composerFile = $this->installDir . DIRECTORY_SEPARATOR . 'composer.json';
-        $json = json_decode(file_get_contents($composerFile), true);
+        $json = $this->openComposerJson();
         $json['require']['croogo/croogo'] = self::CROOGOVERSION;
-        file_put_contents($composerFile, json_encode($json, JSON_PRETTY_PRINT));
+        $this->saveComposerJson($json);
     }
 
     public function setAutoloadScript()
     {
-        $composerFile = $this->installDir . DIRECTORY_SEPARATOR . 'composer.json';
-        $json = json_decode(file_get_contents($composerFile), true);
+        $json = $this->openComposerJson();
         $json['post-autoload-dump'] = [
             'Cake\\Composer\\Installer\\PluginInstaller::postAutoloadDump',
             'Croogo\\Install\\ComposerInstaller::postAutoloadDump'
         ];
-        file_put_contents($composerFile, json_encode($json, JSON_PRETTY_PRINT));
+        $this->saveComposerJson($json);
+    }
+
+    public function clearDependencies()
+    {
+        $json = $this->openComposerJson();
+        unset($json['require']);
+        $this->saveComposerJson($json);
+    }
+
+    public function setDependencies($dependencies)
+    {
+        $json = $this->openComposerJson();
+        $json['require'] = $dependencies;
+        $this->saveComposerJson($json);
     }
 
     public function getDependencyList()
@@ -139,6 +162,8 @@ class CroogoInstaller
             $dependencies[$matches[1][0]] = $matches[2][0];
         }
 
+        $this->clearDependencies();
+
         return $dependencies;
     }
 
@@ -151,7 +176,6 @@ class CroogoInstaller
             '--prefer-dist' => true,
             '--no-interaction' => true,
             '--working-dir' => $this->installDir,
-            '--no-update' => true,
             '--no-progress' => true,
             'packages' => [
                 $package . ($version ? ':' . $version : '')
