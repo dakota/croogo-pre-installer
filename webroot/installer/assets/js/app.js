@@ -1,6 +1,8 @@
 jQuery(function($) {
     'use strict';
 
+    var dependencies = {};
+
     var tabs = {
         '#requirements': function () {
             var $content = $('#requirements .content'),
@@ -53,35 +55,20 @@ jQuery(function($) {
             $content
                 .empty()
                 .append($list);
-
-            $('#requirements a')
-                .removeClass('disabled');
         },
-        '#composer-install': function () {
-            var $content = $('#composer-install .content'),
+        '#create-project': function () {
+            var $content = $('#create-project .content'),
                 $list = $(
                 '<ul class="list-unstyled"></ul>'),
                 steps = [
                     {
-                        title: 'Downloading CakePHP framework', uri: 'scripts/createProject.php'
+                        title: 'Creating initial files', uri: 'scripts/createProject.php'
                     }, {
-                        title: 'Downloading Croogo', uri: 'scripts/installCroogo.php'
+                        title: 'Determining dependencies', uri: 'scripts/getDependencies.php', callback: function (response) {
+                            dependencies = response;
+                        }
                     }
                 ];
-
-            steps.forEach(function (step)
-            {
-                var $listItem = $('<li></li>'),
-                    icon = $('<i class="fa fa-spin fa-spinner"></i>'),
-                    listContent = ' ' + step.title;
-
-                $listItem
-                    .append(icon)
-                    .append(listContent)
-                    .appendTo($list);
-                step.item = $listItem;
-                step.icon = icon;
-            });
 
             $content
                 .empty()
@@ -89,16 +76,67 @@ jQuery(function($) {
 
             steps.forEach(function (step)
             {
+                var $listItem = $('<li></li>'),
+                    icon = $('<i class="fa fa-spin fa-spinner"></i>'),
+                    listContent = ' ' + step.title;
+
                 $.ajaxQueue({
-                        url: step.uri
+                        url: step.uri,
+                        beforeSend: function () {
+                            $listItem
+                                .append(icon)
+                                .append(listContent)
+                                .appendTo($list);
+                        }
+                    })
+                    .done(function (response)
+                    {
+                        icon
+                            .removeClass('fa-spin fa-spinner')
+                            .addClass('fa-check text-success');
+
+                        if (step.callback) {
+                            step.callback(response);
+                        }
+                    });
+
+            });
+        },
+        '#download-croogo': function () {
+            var $content = $('#download-croogo .content'),
+                $list = $('<ul class="list-unstyled"></ul>'),
+                uri = 'scripts/installPackage.php';
+
+            $content
+                .empty()
+                .append($list);
+
+            $.each(dependencies, function (package_name, version)
+            {
+                var $listItem = $('<li></li>'),
+                    icon = $('<i class="fa fa-spin fa-spinner"></i>'),
+                    listContent = ' Installing ' + package_name;
+
+                $.ajaxQueue({
+                        url: uri,
+                        data: {
+                            'package': package_name,
+                            'version': version
+                        },
+                        beforeSend: function ()
+                        {
+                            $listItem
+                                .append(icon)
+                                .append(listContent)
+                                .appendTo($list);
+                        }
                     })
                     .done(function ()
                     {
-                        step.icon
+                        icon
                             .removeClass('fa-spin fa-spinner')
                             .addClass('fa-check text-success');
                     });
-
             });
         }
     };
@@ -110,8 +148,8 @@ jQuery(function($) {
             var href = $(this).attr('href');
 
             $('#tab-buttons a[href="' + href + '"].nav-link').tab('show');
-        })
-        .find('a[data-toggle="switch-tab"]').addClass('disabled');
+        });
+//        .find('a[data-toggle="switch-tab"]').addClass('disabled');
 
     $('#tab-buttons')
         .on('click', 'a[data-toggle="tab"]', function (e) {

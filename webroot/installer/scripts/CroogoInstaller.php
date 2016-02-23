@@ -44,7 +44,7 @@ class CroogoInstaller
         closedir($dir);
     }
 
-    public function requireComposer()
+    protected function requireComposer()
     {
         if (!file_exists($this->composerDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php') ==
             true
@@ -54,14 +54,25 @@ class CroogoInstaller
         }
 
         require_once($this->composerDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
-        include "ComposerOutput.php";
+    }
+
+    protected function runComposer($input)
+    {
+        $this->requireComposer();
+
+        $input = new \Symfony\Component\Console\Input\ArrayInput($input);
+        $output = new \Symfony\Component\Console\Output\BufferedOutput();
+
+        $application = new \Composer\Console\Application();
+        $application->setAutoExit(false);
+        $application->run($input, $output);
+
+        return $output;
     }
 
     public function createProject()
     {
-        $this->requireComposer();
-
-        $input = new \Symfony\Component\Console\Input\ArrayInput([
+        $output = $this->runComposer([
             'command' => 'create-project',
             '--stability' => 'dev',
             '--prefer-dist' => true,
@@ -70,17 +81,14 @@ class CroogoInstaller
             'package' => 'cakephp/app',
             'directory' => $this->tmpDir,
         ]);
-        $output = new ComposerOutput();
-
-        $application = new \Composer\Console\Application();
-        $application->setAutoExit(false);
-        $application->run($input, $output);
 
         $this->recurseCopy($this->tmpDir, $this->installDir);
 
         if (is_file($this->installDir . DIRECTORY_SEPARATOR . 'composer.lock')) {
             unlink($this->installDir . DIRECTORY_SEPARATOR . 'composer.lock');
         }
+
+        return $output->fetch();
     }
 
     public function setMinimumStability()
@@ -114,18 +122,13 @@ class CroogoInstaller
     {
         $this->requireComposer();
 
-        $input = new \Symfony\Component\Console\Input\ArrayInput([
+        $output = $this->runComposer([
             'command' => 'install',
             '--working-dir' => $this->installDir,
             '--dry-run' => true,
             '--no-dev' => true,
             '--no-interaction' => true,
         ]);
-        $output = new \Symfony\Component\Console\Output\BufferedOutput();
-
-        $application = new \Composer\Console\Application();
-        $application->setAutoExit(false);
-        $application->run($input, $output);
 
         $messages = explode("\n", $output->fetch());
         $dependencies = [];
@@ -143,7 +146,7 @@ class CroogoInstaller
     {
         $this->requireComposer();
 
-        $requireInput = [
+        $output = $this->runComposer([
             'command' => 'require',
             '--prefer-dist' => true,
             '--no-interaction' => true,
@@ -151,14 +154,9 @@ class CroogoInstaller
             'packages' => [
                 $package . ($version ? ':' . $version : '')
             ],
-        ];
+        ]);
 
-        $input = new \Symfony\Component\Console\Input\ArrayInput($requireInput);
-        $output = new ComposerOutput();
-
-        $application = new \Composer\Console\Application();
-        $application->setAutoExit(false);
-        $application->run($input, $output);
+        return $output->fetch();
     }
 
     public function cleanup()

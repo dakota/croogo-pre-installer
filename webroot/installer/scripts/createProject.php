@@ -5,7 +5,8 @@ require "CroogoInstaller.php";
 $croogoInstaller = new CroogoInstaller();
 
 $croogoInstaller->cleanup();
-$croogoInstaller->createProject();
+$output = $croogoInstaller->createProject();
 $croogoInstaller->setMinimumStability();
 $croogoInstaller->addCroogoRequire();
 
+echo $output;

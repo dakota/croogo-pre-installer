@@ -25,7 +25,10 @@
                             <a href="#requirements" data-toggle="tab" class="nav-link">Requirements</a>
                         </li>
                         <li class="nav-item">
-                            <a href="#composer-install" data-toggle="tab" class="nav-link">Get Croogo dependencies</a>
+                            <a href="#create-project" data-toggle="tab" class="nav-link">Determine dependencies</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#download-croogo" data-toggle="tab" class="nav-link">Download croogo</a>
                         </li>
                         <li class="nav-item">
                             <a href="#install" data-toggle="tab" class="nav-link">Install Croogo</a>
@@ -38,18 +41,28 @@
                             </div>
                             <div class="row">
                             <div class="pull-right">
-                                <a class="btn btn-primary" href="#composer-install" data-toggle="switch-tab">Next</a>
+                                <a class="btn btn-primary" href="#create-project" data-toggle="switch-tab">Next</a>
                             </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="composer-install" role="tabpanel">
+                        <div class="tab-pane fade" id="create-project" role="tabpanel">
                             <div class="row content">
 
                             </div>
                             <div class="row">
                             <div class="pull-right">
-                                <a class="btn btn-primary" href="#install" data-toggle="switch-tab">Next</a>
+                                <a class="btn btn-primary" href="#download-croogo" data-toggle="switch-tab">Next</a>
                             </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="download-croogo" role="tabpanel">
+                            <div class="row content">
+
+                            </div>
+                            <div class="row">
+                                <div class="pull-right">
+                                    <a class="btn btn-primary" href="#install" data-toggle="switch-tab">Next</a>
+                                </div>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="install" role="tabpanel">
