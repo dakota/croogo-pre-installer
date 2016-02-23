@@ -151,6 +151,8 @@ class CroogoInstaller
             '--prefer-dist' => true,
             '--no-interaction' => true,
             '--working-dir' => $this->installDir,
+            '--no-update' => true,
+            '--no-progress' => true,
             'packages' => [
                 $package . ($version ? ':' . $version : '')
             ],
