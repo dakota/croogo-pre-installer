@@ -8,3 +8,5 @@ if (!$result['ok']) {
     $result['text'] = 'Is not writable';
 }
 require('output.php');
+
+output($result);

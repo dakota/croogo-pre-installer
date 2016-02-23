@@ -28,3 +28,5 @@ if (!empty($missing_extensions)) {
 }
 
 require('output.php');
+
+output($result);

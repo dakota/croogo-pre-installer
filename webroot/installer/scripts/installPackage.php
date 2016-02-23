@@ -3,5 +3,4 @@ require "CroogoInstaller.php";
 
 $croogoInstaller = new CroogoInstaller();
 
-$croogoInstaller->installCroogo();
-$croogoInstaller->cleanup();
+$croogoInstaller->installPackage($_GET['package']);
