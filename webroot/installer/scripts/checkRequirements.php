@@ -2,7 +2,7 @@
 
 function is_empty($directory)
 {
-    return (count(scandir($directory)) == 3);//3 items, one for '.', one for '..' and one for the 'empty' file
+    return (count(scandir($directory)) <= 3);//3 items, one for '.', one for '..' and one for the 'empty' file
 }
 
 function version($minimum)
@@ -21,23 +21,11 @@ function checkRequiredExtensions()
     return !empty($missing_extensions) ? $missing_extensions : true;
 }
 
-function databaseExtensions()
+function availableDrivers()
 {
-    $extensions = get_loaded_extensions();
+    $drivers = PDO::getAvailableDrivers();
 
-    $one_of_extensions = ['pdo_mysql', 'pdo_pgsql', 'pdo_sqlite', 'pdo_sqlsrv'];
+    $supported = ['mysql', 'pgsql', 'sqlite', 'sqlsrv'];
 
-    $has_one = false;
-    foreach ($one_of_extensions as $extension) {
-        if (in_array($extension, $extensions)) {
-            $has_one = true;
-            break;
-        }
-    }
-
-    if ($has_one) {
-        return true;
-    } else {
-        return $one_of_extensions;
-    }
+    return array_intersect($supported, $drivers);
 }

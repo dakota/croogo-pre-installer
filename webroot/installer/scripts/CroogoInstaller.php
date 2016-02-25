@@ -13,9 +13,9 @@ class CroogoInstaller
 
     public function __construct()
     {
-        $this->composerDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'composer';
-        $this->tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'croogo';
         $this->installDir = dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'croogo';
+        $this->composerDir = $this->installDir . DIRECTORY_SEPARATOR . 'composer';
+        $this->tmpDir = $this->installDir . DIRECTORY_SEPARATOR . 'croogo';
     }
 
     protected function delTree($dir)
@@ -86,8 +86,6 @@ class CroogoInstaller
             'directory' => $this->tmpDir,
         ]);
 
-        $this->recurseCopy($this->tmpDir, $this->installDir);
-
         if (is_file($this->installDir . DIRECTORY_SEPARATOR . 'composer.lock')) {
             unlink($this->installDir . DIRECTORY_SEPARATOR . 'composer.lock');
         }
@@ -151,7 +149,7 @@ class CroogoInstaller
 
         $output = $this->runComposer([
             'command' => 'install',
-            '--working-dir' => $this->installDir,
+            '--working-dir' => $this->tmpDir,
             '--dry-run' => true,
             '--no-dev' => true,
             '--no-interaction' => true,
@@ -180,7 +178,7 @@ class CroogoInstaller
             'command' => 'require',
             '--prefer-dist' => true,
             '--no-interaction' => true,
-            '--working-dir' => $this->installDir,
+            '--working-dir' => $this->tmpDir,
             '--no-progress' => true,
             'packages' => [
                 $package . ($version ? ':' . $version : '')

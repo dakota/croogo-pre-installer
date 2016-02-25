@@ -1,164 +1,153 @@
-jQuery(function($) {
+jQuery(function ($) {
     'use strict';
 
-    var dependencies = {};
+    function installCompleted()
+    {
+        $('#install-croogo').find('[data-action="next"]').removeClass('disabled').click();
+    }
 
-    var tabs = {
-        '#requirements': function () {
-            var $content = $('#requirements .content'),
-                $list = $('<ul class="list-unstyled"></ul>'),
-                requirements = [
+    function installDependencies(dependencies)
+    {
+        var $list = $('#install-croogo').find('.list'),
+            $progress = $('<progress class="progress" value="0" max="100">0%</progress>'),
+            $step = $('<span>Begining installation</span>'),
+            $wrapper = $('<div></div>'),
+            $listItem = $('<li></li>'),
+            $icon = $('<i class="fa fa-spin fa-spinner"></i>'),
+            step = Math.ceil(100 / Object.keys(dependencies).length),
+            currentProgress = 0,
+            uri = '/installer/scripts/installPackage.php';
+
+        $listItem.append($icon);
+
+        $wrapper
+            .append($step)
+            .append($progress)
+            .appendTo($listItem);
+
+        $listItem.appendTo($list);
+
+        $.each(dependencies, function (package_name, version)
+        {
+            $.ajaxQueue({
+                    url: uri, data: {
+                        'package': package_name, 'version': version
+                    }, beforeSend: function ()
                     {
-                        title: 'PHP Version (5.5.9+, or 7.0.0+)', uri: 'scripts/phpVersion.php'
-                    }, {
-                        title: 'PHP extensions', uri: 'scripts/phpExtensions.php'
-                    }, {
-                        title: 'Install directory is writable', uri: 'scripts/writable.php'
+                        $step.text('Now installing ' + package_name);
                     }
-                ];
+                })
+                .done(function ()
+                {
+                    currentProgress += step;
+                    $progress
+                        .val(parseInt(currentProgress, 10))
+                        .text(currentProgress + '%');
 
-            requirements.forEach(function (requirement) {
-                var $listItem = $('<li></li>'), icon = $('<i class="fa fa-spin fa-spinner"></i>'), listContent = ' ' +
-                    requirement.title;
-
-                $listItem
-                    .append(icon)
-                    .append(listContent)
-                    .appendTo($list);
-
-                $.ajax({
-                        url: requirement.uri, dataType: 'json'
-                    })
-                    .always(function (response)
-                    {
-                        var $labelItem = $('<span class="label"></span>');
-
-                        icon.removeClass('fa-spin fa-spinner');
-                        if (response.ok == true) {
-                            icon.addClass('fa-check text-success');
-                            $labelItem.addClass('label-success');
-                        } else {
-                            icon.addClass('fa-times text-danger');
-                            $labelItem.addClass('label-danger');
-                        }
-
-                        if (response.text) {
-                            $labelItem.text(response.text);
-
-                            $listItem
-                                .append(' ')
-                                .append($labelItem);
-                        }
-                    });
-            });
-
-            $content
-                .empty()
-                .append($list);
-        },
-        '#create-project': function () {
-            var $content = $('#create-project .content'),
-                $list = $(
-                '<ul class="list-unstyled"></ul>'),
-                steps = [
-                    {
-                        title: 'Creating initial files', uri: 'scripts/createProject.php'
-                    }, {
-                        title: 'Determining dependencies', uri: 'scripts/getDependencies.php', callback: function (response) {
-                            dependencies = response;
-                        }
+                    if (currentProgress >= 100) {
+                        installCompleted();
                     }
-                ];
+                });
+        });
+    }
 
-            $content
-                .empty()
-                .append($list);
+    function croogoInstaller() {
+        var $list = $('#install-croogo').find('.list'),
+            steps = [
+                {
+                    title: 'Creating initial files',
+                    uri: '/installer/scripts/createProject.php'
+                }, {
+                    title: 'Determining dependencies',
+                    uri: '/installer/scripts/getDependencies.php',
+                    callback: function (response) {
+                        installDependencies(response);
+                    }
+                }
+            ];
 
-            steps.forEach(function (step)
-            {
-                var $listItem = $('<li></li>'),
-                    icon = $('<i class="fa fa-spin fa-spinner"></i>'),
-                    listContent = ' ' + step.title;
+        steps.forEach(function (step)
+        {
+            var $listItem = $('<li></li>'),
+                icon = $('<i class="fa fa-spin fa-spinner"></i>'),
+                listContent = ' ' + step.title;
 
-                $.ajaxQueue({
-                        url: step.uri,
-                        beforeSend: function () {
-                            $listItem
-                                .append(icon)
-                                .append(listContent)
-                                .appendTo($list);
-                        }
-                    })
-                    .done(function (response)
-                    {
-                        icon
-                            .removeClass('fa-spin fa-spinner')
-                            .addClass('fa-check text-success');
+            $.ajaxQueue({
+                    url: step.uri,
+                    beforeSend: function () {
+                        $listItem
+                            .append(icon)
+                            .append(listContent)
+                            .appendTo($list);
+                    }
+                })
+                .done(function (response)
+                {
+                    icon
+                        .removeClass('fa-spin fa-spinner')
+                        .addClass('fa-check text-success');
 
-                        if (step.callback) {
-                            step.callback(response);
-                        }
-                    });
+                    if (step.callback) {
+                        step.callback(response);
+                    }
+                });
 
-            });
-        },
-        '#download-croogo': function () {
-            var $content = $('#download-croogo .content'),
-                $list = $('<ul class="list-unstyled"></ul>'),
-                uri = 'scripts/installPackage.php';
-
-            $content
-                .empty()
-                .append($list);
-
-            $.each(dependencies, function (package_name, version)
-            {
-                var $listItem = $('<li></li>'),
-                    icon = $('<i class="fa fa-spin fa-spinner"></i>'),
-                    listContent = ' Installing ' + package_name;
-
-                $.ajaxQueue({
-                        url: uri,
-                        data: {
-                            'package': package_name,
-                            'version': version
-                        },
-                        beforeSend: function ()
-                        {
-                            $listItem
-                                .append(icon)
-                                .append(listContent)
-                                .appendTo($list);
-                        }
-                    })
-                    .done(function ()
-                    {
-                        icon
-                            .removeClass('fa-spin fa-spinner')
-                            .addClass('fa-check text-success');
-                    });
-            });
-        }
+        });
     };
 
+    var $tabButtons = $('#tab-buttons');
+
     $('#tab-content')
-        .on('click', 'a[data-toggle="switch-tab"]', function (e)
+        .on('click', 'button[data-action]', function (e)
         {
             e.preventDefault();
-            var href = $(this).attr('href');
+            var
+                $this = $(this),
+                $currentTab = $tabButtons.find('.active'),
+                action = $this.data('action');
 
-            $('#tab-buttons a[href="' + href + '"].nav-link').tab('show');
+            if (action === 'next' && $currentTab.data('next')) {
+                $currentTab.parent().next().find('a').tab('show');
+            } else if (action === 'previous' && $currentTab.data('previous')) {
+                $currentTab.parent().prev().find('a').tab('show');
+            }
         });
-//        .find('a[data-toggle="switch-tab"]').addClass('disabled');
 
-    $('#tab-buttons')
+    $tabButtons
         .on('click', 'a[data-toggle="tab"]', function (e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             return false;
         })
-        .on('shown.bs.tab', function (e) {
-            tabs[$(e.target).attr('href')]();
-        })
         .find('a:first').tab('show');
+
+    $tabButtons
+        .on('show.bs.tab', 'a[href="#install-croogo"]', croogoInstaller)
+        .on('hide.bs.tab', 'a[href="#database-config"],a[href="#site-details"]', function (e) {
+            var
+                target = e.target.href.split('#')[1],
+                allValid = true;
+
+            $('#'+ target).find(':input').each(function () {
+                var valid = this.checkValidity();
+
+                $(this)
+                    .find('.text-help').remove()
+                    .closest('.form-group')
+                    .removeClass('has-danger');
+
+                if (!valid) {
+                    $(this)
+                        .after('<p class="text-help">This field is required</p>')
+                        .closest('.form-group')
+                        .addClass('has-danger');
+                }
+
+                allValid = allValid && valid;
+            });
+
+            if (!allValid) {
+                e.preventDefault();
+            }
+        });
 });
