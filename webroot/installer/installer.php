@@ -166,7 +166,7 @@ $availableDrivers = availableDrivers();
                                 <div class="form-group row">
                                     <label for="database-datasource" class="col-sm-3 form-control-label">Database</label>
                                     <div class="col-sm-9">
-                                        <select class="form-control c-select" id="database-datasource" required>
+                                        <select class="form-control c-select" id="database-datasource" name="database-datasource" required>
                                             <?php foreach ($availableDrivers as $driver) : ?>
                                             <option value="<?php echo $driver ?>"><?php echo $driver ?></option>
                                             <?php endforeach; ?>
@@ -180,7 +180,7 @@ $availableDrivers = availableDrivers();
                                         Database hostname or IP Address
                                     </label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="database-host" value="localhost" required>
+                                        <input type="text" class="form-control" id="database-host" name="database-host" value="localhost" required>
                                         <small class="text-muted">This is normally <em>localhost</em>, your hosting provider will normally tell you
                                         if it needs to be something else.</small>
                                     </div>
@@ -190,7 +190,7 @@ $availableDrivers = availableDrivers();
                                         Database port
                                     </label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="database-port">
+                                        <input type="text" class="form-control" id="database-port" name="database-port">
                                         <small class="text-muted">Leave this blank if you don't know what it should be</small>
                                     </div>
                                 </div>
@@ -202,7 +202,7 @@ $availableDrivers = availableDrivers();
                                         Database name
                                     </label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="database-database" required>
+                                        <input type="text" class="form-control" id="database-database" name="database-database" required>
                                         <small class="text-muted">The name of the database you want to install Croogo too
                                         </small>
                                     </div>
@@ -212,7 +212,7 @@ $availableDrivers = availableDrivers();
                                         Database username
                                     </label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="database-username" required>
+                                        <input type="text" class="form-control" id="database-username" name="database-username" required>
                                         <small class="text-muted">The username that your host has provided for accessing your database</small>
                                     </div>
 
@@ -222,7 +222,7 @@ $availableDrivers = availableDrivers();
                                         Database password
                                     </label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="database-password" required>
+                                        <input type="text" class="form-control" id="database-password" name="database-password" required>
                                         <small class="text-muted">The password that your host has provided for accessing your
                                             database
                                         </small>
@@ -252,7 +252,7 @@ $availableDrivers = availableDrivers();
                                 <div class="form-group row">
                                     <label for="site-name" class="col-sm-3 form-control-label">Site name</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control" id="site-name" value="Croogo - Content Management System" required />
+                                        <input class="form-control" id="site-name" name="site-name" value="Croogo - Content Management System" required />
                                         <small class="text-muted">
                                             The name of your website.
                                         </small>
@@ -262,7 +262,7 @@ $availableDrivers = availableDrivers();
                                     <label for="site-tagline" class="col-sm-3 form-control-label">Tagline</label>
                                     <div class="col-sm-9">
                                         <input class="form-control"
-                                               id="site-tagline"
+                                               id="site-tagline" name="site-tagline"
                                                value="A CakePHP powered Content Management System."
                                                required/>
                                     </div>
@@ -271,7 +271,7 @@ $availableDrivers = availableDrivers();
                                     <label for="site-description" class="col-sm-3 form-control-label">Description</label>
                                     <div class="col-sm-9">
                                         <input class="form-control"
-                                               id="site-description"
+                                               id="site-description" name="site-description"
                                                value="Croogo - A CakePHP powered Content Management System"
                                                required/>
                                         <small class="text-muted">
@@ -283,7 +283,7 @@ $availableDrivers = availableDrivers();
                                     <label for="site-keywords" class="col-sm-3 form-control-label">Keywords</label>
                                     <div class="col-sm-9">
                                         <input class="form-control"
-                                               id="site-keywords"
+                                               id="site-keywords" name="site-keywords"
                                                value="croogo, croogo, cakephp"
                                                required/>
                                         <small class="text-muted">
@@ -295,7 +295,7 @@ $availableDrivers = availableDrivers();
                                     <label for="site-email" class="col-sm-3 form-control-label">Site email address</label>
                                     <div class="col-sm-9">
                                         <input class="form-control"
-                                               id="site-email"
+                                               id="site-email" name="site-email"
                                                required/>
                                         <small class="text-muted">
                                             Site email address.
@@ -310,7 +310,7 @@ $availableDrivers = availableDrivers();
                                         Admin username
                                     </label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="admin-username" required>
+                                        <input type="text" class="form-control" id="admin-username" name="admin-username" value="admin" required>
                                         <small class="text-muted">
                                             Username for the main administration user.
                                         </small>
@@ -321,7 +321,7 @@ $availableDrivers = availableDrivers();
                                         Admin password
                                     </label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="admin-password" required>
+                                        <input type="text" class="form-control" id="admin-password" name="admin-password" value="admin" required>
                                         <small class="text-muted">
                                             Password for the main administration user.
                                         </small>

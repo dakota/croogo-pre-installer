@@ -10,6 +10,13 @@ class CroogoInstaller
     protected $composerDir;
     protected $tmpDir;
     protected $installDir;
+    protected $databaseDrivers = [
+        'mysql' => 'Cake\Database\Driver\Mysql',
+        'postgres' => 'Cake\Database\Driver\Postgres',
+        'sqlite' => 'Cake\Database\Driver\Sqlite',
+        'sqlsrv' => 'Cake\Database\Driver\Sqlserver',
+        'sqlserver' => 'Cake\Database\Driver\Sqlserver',
+    ];
 
     public function __construct()
     {
@@ -72,7 +79,7 @@ class CroogoInstaller
 
     public function createProject()
     {
-        if (is_file($this->installDir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR . 'AppController.php') && is_file($this->installDir)) {
+        if (is_file($this->tmpDir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR . 'AppController.php') && is_file($this->installDir)) {
             return 'already installed';
         }
 
@@ -86,8 +93,8 @@ class CroogoInstaller
             'directory' => $this->tmpDir,
         ]);
 
-        if (is_file($this->installDir . DIRECTORY_SEPARATOR . 'composer.lock')) {
-            unlink($this->installDir . DIRECTORY_SEPARATOR . 'composer.lock');
+        if (is_file($this->tmpDir . DIRECTORY_SEPARATOR . 'composer.lock')) {
+            unlink($this->tmpDir . DIRECTORY_SEPARATOR . 'composer.lock');
         }
 
         return $output->fetch();
@@ -95,13 +102,13 @@ class CroogoInstaller
 
     protected function openComposerJson()
     {
-        $composerFile = $this->installDir . DIRECTORY_SEPARATOR . 'composer.json';
+        $composerFile = $this->tmpDir . DIRECTORY_SEPARATOR . 'composer.json';
         return json_decode(file_get_contents($composerFile), true);
     }
 
     protected function saveComposerJson($json)
     {
-        $composerFile = $this->installDir . DIRECTORY_SEPARATOR . 'composer.json';
+        $composerFile = $this->tmpDir . DIRECTORY_SEPARATOR . 'composer.json';
         file_put_contents($composerFile, json_encode($json, JSON_PRETTY_PRINT));
     }
 
@@ -167,11 +174,22 @@ class CroogoInstaller
 
         $this->clearDependencies();
 
+        $dependencyFile = $this->installDir . DIRECTORY_SEPARATOR . 'dependencies.json';
+
+        file_put_contents($dependencyFile, json_encode($dependencies));
+
         return $dependencies;
     }
 
     public function installPackage($package, $version)
     {
+
+        $allowedPackages = json_decode(file_get_contents($this->installDir . DIRECTORY_SEPARATOR . 'dependencies.json'), true);
+
+        if (!isset($allowedPackages[$package])) {
+            return;
+        }
+
         $this->requireComposer();
 
         $output = $this->runComposer([
@@ -197,5 +215,35 @@ class CroogoInstaller
         if (is_dir($this->tmpDir)) {
             $this->delTree($this->tmpDir);
         }
+    }
+
+    public function configureSite($data)
+    {
+        require $this->tmpDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+        $siteConfiguration = json_decode(file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'settings.json'), true);
+
+        $siteConfiguration['Site']['name'] = $data['site-name'];
+        $siteConfiguration['Site']['email'] = $data['site-email'];
+        $siteConfiguration['Site']['tagline'] = $data['site-tagline'];
+        $siteConfiguration['Meta']['description'] = $data['site-description'];
+        $siteConfiguration['Meta']['keywords'] = $data['site-keywords'];
+        $siteConfiguration['Admin']['username'] = $data['admin-username'];
+        $siteConfiguration['Admin']['password'] = $data['admin-password'];
+
+        $configDir = $this->tmpDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+        file_put_contents($configDir . 'settings.json', json_encode($siteConfiguration, JSON_PRETTY_PRINT));
+
+        rename($configDir . 'app.default.php', $configDir . 'app.php');
+
+        \Cake\Core\Configure::config('default', new \Cake\Core\Configure\Engine\PhpConfig($configDir));
+        \Cake\Core\Configure::load('app', 'default', false);
+        \Cake\Core\Configure::write('Datasources.default.driver', $this->databaseDrivers[$data['database-datasource']]);
+        \Cake\Core\Configure::write('Datasources.default.host', $data['database-host']);
+        \Cake\Core\Configure::write('Datasources.default.port', $data['database-port']);
+        \Cake\Core\Configure::write('Datasources.default.username', $data['database-username']);
+        \Cake\Core\Configure::write('Datasources.default.password', $data['database-password']);
+        \Cake\Core\Configure::write('Datasources.default.database', $data['database-database']);
+        \Cake\Core\Configure::dump('app', 'default');
     }
 }

@@ -1,16 +1,85 @@
 jQuery(function ($) {
     'use strict';
 
+    function runSteps(steps, $list)
+    {
+        steps.forEach(function (step)
+        {
+            var $listItem = $('<li></li>'),
+                icon = $('<i class="fa fa-spin fa-spinner"></i>'),
+                listContent = ' ' + step.title,
+                ajaxOptions = {};
+
+            if (step.ajaxOptions) {
+                ajaxOptions = step.ajaxOptions();
+            }
+
+            $.ajaxQueue($.extend(ajaxOptions, {
+                url: step.uri,
+                dataType: 'json', cache: false,
+                beforeSend: function (jqXHR, settings)
+                    {
+                        $listItem
+                            .append(icon)
+                            .append(listContent)
+                            .appendTo($list);
+
+                        if (step.beforeSend) {
+                            step.beforeSend(jqXHR, settings);
+                        }
+                    }
+                }))
+                .done(function (response)
+                {
+                    icon
+                        .removeClass('fa-spin fa-spinner')
+                        .addClass('fa-check text-success');
+
+                    if (step.success) {
+                        step.success(response);
+                    }
+                });
+        });
+    }
+
     function installCompleted()
     {
-        $('#install-croogo').find('[data-action="next"]').removeClass('disabled').click();
+        var $list = $('#install-croogo').find('.list'),
+            steps = [
+                {
+                    title: 'Site configuration',
+                    uri: '/installer/scripts/siteConfiguration.php',
+                    ajaxOptions: function () {
+                        var siteData = $('#database-config').find('form').serializeArray();
+                        $.extend(siteData, $('#site-details').find('form').serializeArray());
+                        return {
+                            data: siteData,
+                            method: 'POST'
+                        }
+                    }
+                },
+                {
+                    title: 'Database installation',
+                    uri: '/installer/scripts/databaseInstall.php'
+                },
+                {
+                    title: 'Move files',
+                    uri: '/installer/scripts/moveFiles.php'
+                },
+                {
+                    title: 'Test installation',
+                    uri: '/test-installation'
+                }
+            ];
+
+        runSteps(steps, $list);
     }
 
     function installDependencies(dependencies)
     {
         var $list = $('#install-croogo').find('.list'),
             $progress = $('<progress class="progress" value="0" max="100">0%</progress>'),
-            $step = $('<span>Begining installation</span>'),
+            $step = $('<span></span>'),
             $wrapper = $('<div></div>'),
             $listItem = $('<li></li>'),
             $icon = $('<i class="fa fa-spin fa-spinner"></i>'),
@@ -18,7 +87,9 @@ jQuery(function ($) {
             currentProgress = 0,
             uri = '/installer/scripts/installPackage.php';
 
-        $listItem.append($icon);
+        $listItem
+            .append($icon)
+            .append(' Downloading Croogo files');
 
         $wrapper
             .append($step)
@@ -45,6 +116,10 @@ jQuery(function ($) {
                         .text(currentProgress + '%');
 
                     if (currentProgress >= 100) {
+                        $wrapper.remove();
+                        icon
+                            .removeClass('fa-spin fa-spinner')
+                            .addClass('fa-check text-success');
                         installCompleted();
                     }
                 });
@@ -60,39 +135,13 @@ jQuery(function ($) {
                 }, {
                     title: 'Determining dependencies',
                     uri: '/installer/scripts/getDependencies.php',
-                    callback: function (response) {
+                    success: function (response) {
                         installDependencies(response);
                     }
                 }
             ];
 
-        steps.forEach(function (step)
-        {
-            var $listItem = $('<li></li>'),
-                icon = $('<i class="fa fa-spin fa-spinner"></i>'),
-                listContent = ' ' + step.title;
-
-            $.ajaxQueue({
-                    url: step.uri,
-                    beforeSend: function () {
-                        $listItem
-                            .append(icon)
-                            .append(listContent)
-                            .appendTo($list);
-                    }
-                })
-                .done(function (response)
-                {
-                    icon
-                        .removeClass('fa-spin fa-spinner')
-                        .addClass('fa-check text-success');
-
-                    if (step.callback) {
-                        step.callback(response);
-                    }
-                });
-
-        });
+        runSteps(steps, $list);
     };
 
     var $tabButtons = $('#tab-buttons');
