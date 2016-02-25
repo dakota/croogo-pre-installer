@@ -296,6 +296,7 @@ $availableDrivers = availableDrivers();
                                     <div class="col-sm-9">
                                         <input class="form-control"
                                                id="site-email" name="site-email"
+                                               value="you@example.com"
                                                required/>
                                         <small class="text-muted">
                                             Site email address.

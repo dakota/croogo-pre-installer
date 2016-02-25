@@ -6,7 +6,7 @@ jQuery(function ($) {
         steps.forEach(function (step)
         {
             var $listItem = $('<li></li>'),
-                icon = $('<i class="fa fa-spin fa-spinner"></i>'),
+                $icon = $('<i class="fa fa-spin fa-spinner"></i>'),
                 listContent = ' ' + step.title,
                 ajaxOptions = {};
 
@@ -20,7 +20,7 @@ jQuery(function ($) {
                 beforeSend: function (jqXHR, settings)
                     {
                         $listItem
-                            .append(icon)
+                            .append($icon)
                             .append(listContent)
                             .appendTo($list);
 
@@ -31,7 +31,7 @@ jQuery(function ($) {
                 }))
                 .done(function (response)
                 {
-                    icon
+                    $icon
                         .removeClass('fa-spin fa-spinner')
                         .addClass('fa-check text-success');
 
@@ -117,7 +117,7 @@ jQuery(function ($) {
 
                     if (currentProgress >= 100) {
                         $wrapper.remove();
-                        icon
+                        $icon
                             .removeClass('fa-spin fa-spinner')
                             .addClass('fa-check text-success');
                         installCompleted();

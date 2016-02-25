@@ -129,7 +129,7 @@ class CroogoInstaller
     public function setAutoloadScript()
     {
         $json = $this->openComposerJson();
-        $json['post-autoload-dump'] = [
+        $json['scripts']['post-autoload-dump'] = [
             'Cake\\Composer\\Installer\\PluginInstaller::postAutoloadDump',
             'Croogo\\Install\\ComposerInstaller::postAutoloadDump'
         ];
@@ -139,7 +139,8 @@ class CroogoInstaller
     public function clearDependencies()
     {
         $json = $this->openComposerJson();
-        unset($json['require']);
+        $json['require'] = [];
+        $json['require-dev'] = [];
         $this->saveComposerJson($json);
     }
 
@@ -165,7 +166,7 @@ class CroogoInstaller
         $messages = explode("\n", $output->fetch());
         $dependencies = [];
         foreach ($messages as $message) {
-            if (preg_match_all('/Installing (.*\/.*) \((.*)/', $message, $matches) == 0) {
+            if (preg_match_all('/Installing (.*\/.*) \((.*)\)/', $message, $matches) == 0) {
                 continue;
             }
             $version = explode(' ', $matches[2][0]);
@@ -190,8 +191,6 @@ class CroogoInstaller
             return;
         }
 
-        $this->requireComposer();
-
         $output = $this->runComposer([
             'command' => 'require',
             '--prefer-dist' => true,
@@ -204,6 +203,14 @@ class CroogoInstaller
         ]);
 
         return $output->fetch();
+    }
+
+    public function dumpAutoloader()
+    {
+        return $this->runComposer([
+            'command' => 'dumpautoload',
+            '--working-dir' => $this->tmpDir,
+        ]);
     }
 
     public function cleanup()
