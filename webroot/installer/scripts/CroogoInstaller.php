@@ -246,4 +246,27 @@ class CroogoInstaller
         \Cake\Core\Configure::write('Datasources.default.database', $data['database-database']);
         \Cake\Core\Configure::dump('app', 'default');
     }
+
+    public function databaseInstall()
+    {
+        require $this->tmpDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+        $schema = explode(';', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'schema.sql'));
+
+        $configDir = $this->tmpDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+
+        \Cake\Core\Configure::config('default', new \Cake\Core\Configure\Engine\PhpConfig($configDir));
+        \Cake\Core\Configure::load('app', 'default', false);
+        \Cake\Datasource\ConnectionManager::config(\Cake\Core\Configure::consume('Datasources'));
+        $connection = \Cake\Datasource\ConnectionManager::get('default');
+
+        foreach ($schema as $sql) {
+            $connection->query($sql);
+        }
+    }
+
+    public function moveFiles()
+    {
+        $this->recurseCopy($this->tmpDir, dirname($this->installDir));
+    }
 }
