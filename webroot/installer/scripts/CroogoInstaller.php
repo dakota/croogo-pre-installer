@@ -15,7 +15,7 @@ class CroogoInstaller
     {
         $this->composerDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'composer';
         $this->tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'croogo';
-        $this->installDir = dirname(dirname(dirname(__DIR__)));
+        $this->installDir = dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'croogo';
     }
 
     protected function delTree($dir)
@@ -72,6 +72,10 @@ class CroogoInstaller
 
     public function createProject()
     {
+        if (is_file($this->installDir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR . 'AppController.php') && is_file($this->installDir)) {
+            return 'already installed';
+        }
+
         $output = $this->runComposer([
             'command' => 'create-project',
             '--stability' => 'dev',
@@ -156,10 +160,11 @@ class CroogoInstaller
         $messages = explode("\n", $output->fetch());
         $dependencies = [];
         foreach ($messages as $message) {
-            if (preg_match_all('/Installing (.*\/.*) \((.*)\)/', $message, $matches) == 0) {
+            if (preg_match_all('/Installing (.*\/.*) \((.*)/', $message, $matches) == 0) {
                 continue;
             }
-            $dependencies[$matches[1][0]] = $matches[2][0];
+            $version = explode(' ', $matches[2][0]);
+            $dependencies[$matches[1][0]] = $version[0];
         }
 
         $this->clearDependencies();
