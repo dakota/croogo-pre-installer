@@ -688,42 +688,42 @@ CREATE TABLE IF NOT EXISTS `settings` (
   `updated_by` int(20) DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO `settings` (`id`, `key`, `value`, `title`, `description`, `input_type`, `editable`, `weight`, `params`, `created`, `created_by`, `updated`, `updated_by`) VALUES
-(6, 'Site.title', 'Croogo', '', '', '', 1, 1, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(7, 'Site.tagline', '', '', '', 'textarea', 1, 2, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(8, 'Site.email', '', '', '', '', 1, 3, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(9, 'Site.status', '1', '', '', 'checkbox', 1, 6, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(12, 'Meta.robots', 'index, follow', '', '', '', 1, 6, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(13, 'Meta.keywords', 'croogo, Croogo', '', '', 'textarea', 1, 7, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(14, 'Meta.description', 'Croogo - A CakePHP powered Content Management System', '', '', 'textarea', 1, 8, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(15, 'Meta.generator', 'Croogo - Content Management System', '', '', '', 0, 9, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(16, 'Service.akismet_key', 'your-key', '', '', '', 1, 11, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(17, 'Service.recaptcha_public_key', 'your-public-key', '', '', '', 1, 12, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(18, 'Service.recaptcha_private_key', 'your-private-key', '', '', '', 1, 13, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(19, 'Service.akismet_url', 'http://your-blog.com', '', '', '', 1, 10, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(20, 'Site.theme', 'Croogo/Core', '', '', '', 0, 14, '', '2015-09-03 18:33:17', 1, '2015-09-03 18:33:17', 1),
-(21, 'Site.feed_url', '', '', '', '', 0, 15, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(22, 'Reading.nodes_per_page', '5', '', '', '', 1, 16, '', '2015-09-03 18:33:17', NULL, '2015-09-03 20:24:24', 1),
-(23, 'Writing.wysiwyg', '1', 'Enable WYSIWYG editor', '', 'checkbox', 1, 17, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(24, 'Comment.level', '1', '', 'levels deep (threaded comments)', '', 1, 18, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(25, 'Comment.feed_limit', '10', '', 'number of comments to show in feed', '', 1, 19, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(26, 'Site.locale', 'eng', '', '', 'text', 1, 20, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(27, 'Reading.date_time_format', 'd M, y', '', '', '', 1, 21, '', '2015-09-03 18:33:17', NULL, '2015-09-03 20:24:24', 1),
-(28, 'Comment.date_time_format', 'M d, Y', '', '', '', 1, 22, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(29, 'Site.timezone', 'UTC', '', 'Provide a valid timezone identifier as specified in https://php.net/manual/en/timezones.php', '', 1, 4, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(32, 'Hook.bootstraps', 'Croogo/Settings,Croogo/Comments,Croogo/Contacts,Croogo/Nodes,Croogo/Meta,Croogo/Menus,Croogo/Users,Croogo/Blocks,Croogo/Taxonomy,Croogo/FileManager,Croogo/Wysiwyg', '', '', '', 0, 23, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', 1),
-(33, 'Comment.email_notification', '1', 'Enable email notification', '', 'checkbox', 1, 24, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(34, 'Access Control.multiRole', '0', 'Enable Multiple Roles', '', 'checkbox', 1, 25, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(35, 'Access Control.rowLevel', '0', 'Row Level Access Control', '', 'checkbox', 1, 26, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(36, 'Access Control.autoLoginDuration', '', '"Remember Me" Duration', 'Eg: +1 day, +1 week. Leave empty to disable.', 'text', 1, 27, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(37, 'Access Control.models', '', 'Models with Row Level Acl', 'Select models to activate Row Level Access Control on', 'multiple', 1, 26, 'multiple=checkbox\noptions={"Nodes.Node": "Node", "Blocks.Block": "Block", "Menus.Menu": "Menu", "Menus.Link": "Link"}', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
-(38, 'Site.ipWhitelist', '127.0.0.1', 'Whitelisted IP Addresses', 'Separate multiple IP addresses with comma', 'text', 1, 27, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(39, 'Site.asset_timestamp', '1', 'Asset timestamp', 'Appends a timestamp which is last modified time of the particular file at the end of asset files URLs (CSS, JavaScript, Image). Useful to prevent visitors to visit the site with an outdated version of these files in their browser cache.', 'radio', 1, 28, 'options={"0": "Disabled", "1": "Enabled in debug mode only", "force": "Always enabled"}', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(40, 'Site.admin_theme', 'Croogo/Core', 'Administration Theme', '', 'text', 1, 29, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(41, 'Site.home_url', '', 'Home Url', 'Default action for home page in link string format.', 'text', 1, 30, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
-(42, 'Croogo.installed', '1', '', '', '', 0, 31, '', '2015-09-03 18:33:29', NULL, '2015-09-03 18:33:29', NULL),
-(43, 'Croogo.version', '3.0.0', '', '', '', 0, 32, '', '2015-09-03 18:38:48', 1, '2015-09-03 18:38:48', 1),
-(44, 'Site.acl_plugin', 'Croogo/Acl', '', '', 'text', 1, NULL, '', NULL, NULL, NULL, NULL);
+-- INSERT INTO `settings` (`id`, `key`, `value`, `title`, `description`, `input_type`, `editable`, `weight`, `params`, `created`, `created_by`, `updated`, `updated_by`) VALUES
+-- (6, 'Site.title', 'Croogo', '', '', '', 1, 1, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (7, 'Site.tagline', '', '', '', 'textarea', 1, 2, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (8, 'Site.email', '', '', '', '', 1, 3, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (9, 'Site.status', '1', '', '', 'checkbox', 1, 6, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (12, 'Meta.robots', 'index, follow', '', '', '', 1, 6, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (13, 'Meta.keywords', 'croogo, Croogo', '', '', 'textarea', 1, 7, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (14, 'Meta.description', 'Croogo - A CakePHP powered Content Management System', '', '', 'textarea', 1, 8, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (15, 'Meta.generator', 'Croogo - Content Management System', '', '', '', 0, 9, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (16, 'Service.akismet_key', 'your-key', '', '', '', 1, 11, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (17, 'Service.recaptcha_public_key', 'your-public-key', '', '', '', 1, 12, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (18, 'Service.recaptcha_private_key', 'your-private-key', '', '', '', 1, 13, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (19, 'Service.akismet_url', 'http://your-blog.com', '', '', '', 1, 10, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (20, 'Site.theme', 'Croogo/Core', '', '', '', 0, 14, '', '2015-09-03 18:33:17', 1, '2015-09-03 18:33:17', 1),
+-- (21, 'Site.feed_url', '', '', '', '', 0, 15, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (22, 'Reading.nodes_per_page', '5', '', '', '', 1, 16, '', '2015-09-03 18:33:17', NULL, '2015-09-03 20:24:24', 1),
+-- (23, 'Writing.wysiwyg', '1', 'Enable WYSIWYG editor', '', 'checkbox', 1, 17, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (24, 'Comment.level', '1', '', 'levels deep (threaded comments)', '', 1, 18, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (25, 'Comment.feed_limit', '10', '', 'number of comments to show in feed', '', 1, 19, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (26, 'Site.locale', 'eng', '', '', 'text', 1, 20, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (27, 'Reading.date_time_format', 'd M, y', '', '', '', 1, 21, '', '2015-09-03 18:33:17', NULL, '2015-09-03 20:24:24', 1),
+-- (28, 'Comment.date_time_format', 'M d, Y', '', '', '', 1, 22, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (29, 'Site.timezone', 'UTC', '', 'Provide a valid timezone identifier as specified in https://php.net/manual/en/timezones.php', '', 1, 4, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (32, 'Hook.bootstraps', 'Croogo/Settings,Croogo/Comments,Croogo/Contacts,Croogo/Nodes,Croogo/Meta,Croogo/Menus,Croogo/Users,Croogo/Blocks,Croogo/Taxonomy,Croogo/FileManager,Croogo/Wysiwyg', '', '', '', 0, 23, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', 1),
+-- (33, 'Comment.email_notification', '1', 'Enable email notification', '', 'checkbox', 1, 24, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (34, 'Access Control.multiRole', '0', 'Enable Multiple Roles', '', 'checkbox', 1, 25, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (35, 'Access Control.rowLevel', '0', 'Row Level Access Control', '', 'checkbox', 1, 26, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (36, 'Access Control.autoLoginDuration', '', '"Remember Me" Duration', 'Eg: +1 day, +1 week. Leave empty to disable.', 'text', 1, 27, '', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (37, 'Access Control.models', '', 'Models with Row Level Acl', 'Select models to activate Row Level Access Control on', 'multiple', 1, 26, 'multiple=checkbox\noptions={"Nodes.Node": "Node", "Blocks.Block": "Block", "Menus.Menu": "Menu", "Menus.Link": "Link"}', '2015-09-03 18:33:17', NULL, '2015-09-03 18:33:17', NULL),
+-- (38, 'Site.ipWhitelist', '127.0.0.1', 'Whitelisted IP Addresses', 'Separate multiple IP addresses with comma', 'text', 1, 27, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (39, 'Site.asset_timestamp', '1', 'Asset timestamp', 'Appends a timestamp which is last modified time of the particular file at the end of asset files URLs (CSS, JavaScript, Image). Useful to prevent visitors to visit the site with an outdated version of these files in their browser cache.', 'radio', 1, 28, 'options={"0": "Disabled", "1": "Enabled in debug mode only", "force": "Always enabled"}', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (40, 'Site.admin_theme', 'Croogo/Core', 'Administration Theme', '', 'text', 1, 29, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (41, 'Site.home_url', '', 'Home Url', 'Default action for home page in link string format.', 'text', 1, 30, '', '2015-09-03 18:33:17', 1, '2015-09-03 21:42:20', 1),
+-- (42, 'Croogo.installed', '1', '', '', '', 0, 31, '', '2015-09-03 18:33:29', NULL, '2015-09-03 18:33:29', NULL),
+-- (43, 'Croogo.version', '3.0.0', '', '', '', 0, 32, '', '2015-09-03 18:38:48', 1, '2015-09-03 18:38:48', 1),
+-- (44, 'Site.acl_plugin', 'Croogo/Acl', '', '', 'text', 1, NULL, '', NULL, NULL, NULL, NULL);
 
 CREATE TABLE IF NOT EXISTS `taxonomies` (
 `id` int(20) NOT NULL,
@@ -795,7 +795,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `users` (`id`, `role_id`, `username`, `password`, `name`, `email`, `website`, `activation_key`, `image`, `bio`, `status`, `updated`, `updated_by`, `created`, `timezone`, `created_by`) VALUES
-(1, 1, 'croogo', '$2y$10$Gil2pSZBSRkhOmxxXD/Bm.PnirzS9EoPq0iZGuZZMcXDXCuJ9zu0m', 'Croogo developer', 'croogo@croogoorg', 'cvo-technologies.com', '912a39c823ce4867b8f1214f7e1904f5', NULL, NULL, 1, '2015-09-03 18:33:29', NULL, '2015-09-03 18:33:29', '310', NULL);
+(1, 1, '{{admin-username}}', '{{admin-password}}', 'Croogo developer', '{{site-email}}', '', '', NULL, NULL, 1, '{{date}}', NULL, '{{date}}', '310', NULL);
 
 CREATE TABLE IF NOT EXISTS `vocabularies` (
 `id` int(10) NOT NULL,

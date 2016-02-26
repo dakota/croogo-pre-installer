@@ -3,6 +3,11 @@ require 'scripts/checkRequirements.php';
 $directory = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'croogo';
 
 $exists = is_dir($directory);
+if (!$exists) {
+    mkdir($directory);
+    $exists = is_dir($directory);
+}
+
 $writable = is_writable($directory);
 $phpVersion = phpversion();
 $minimumPhpVersion = '5.5.9';

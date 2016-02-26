@@ -139,8 +139,9 @@ class CroogoInstaller
     public function clearDependencies()
     {
         $json = $this->openComposerJson();
-        $json['require'] = [];
-        $json['require-dev'] = [];
+        $json['require'] = new stdClass();
+        $json['require-dev'] = new stdClass();
+        unset($json['scripts']);
         $this->saveComposerJson($json);
     }
 
@@ -170,7 +171,10 @@ class CroogoInstaller
                 continue;
             }
             $version = explode(' ', $matches[2][0]);
-            $dependencies[$matches[1][0]] = $version[0];
+            $dependencies[] = [
+                'package' => $matches[1][0],
+                'version' => $version[0]
+            ];
         }
 
         $this->clearDependencies();
@@ -184,11 +188,17 @@ class CroogoInstaller
 
     public function installPackage($package, $version)
     {
-
         $allowedPackages = json_decode(file_get_contents($this->installDir . DIRECTORY_SEPARATOR . 'dependencies.json'), true);
 
-        if (!isset($allowedPackages[$package])) {
-            return;
+        $allowed = false;
+        foreach ($allowedPackages as $allowedPackage) {
+            if ($allowedPackage['package'] === $package) {
+                $allowed = true;
+                break;
+            }
+        }
+        if (!$allowed) {
+            return false;
         }
 
         $output = $this->runComposer([
@@ -241,7 +251,9 @@ class CroogoInstaller
         $configDir = $this->tmpDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
         file_put_contents($configDir . 'settings.json', json_encode($siteConfiguration, JSON_PRETTY_PRINT));
 
-        rename($configDir . 'app.default.php', $configDir . 'app.php');
+        if (!file_exists($configDir . 'app.php')) {
+            rename($configDir . 'app.default.php', $configDir . 'app.php');
+        }
 
         \Cake\Core\Configure::config('default', new \Cake\Core\Configure\Engine\PhpConfig($configDir));
         \Cake\Core\Configure::load('app', 'default', false);
@@ -258,9 +270,20 @@ class CroogoInstaller
     {
         require $this->tmpDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-        $schema = explode(';', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'schema.sql'));
-
         $configDir = $this->tmpDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+
+        $schema = explode(';', file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'schema.sql'));
+        $siteConfiguration = json_decode(file_get_contents($configDir . 'settings.json'), true);
+
+        $replacements = [
+            '{{admin-username}}' => $siteConfiguration['Admin']['username'],
+            '{{admin-password}}' => (new \Cake\Auth\DefaultPasswordHasher())->hash($siteConfiguration['Admin']['password']),
+            '{{site-email}}' => $siteConfiguration['Site']['email'],
+            '{{date}}' => date('Y-m-d H:i:s'),
+        ];
+
+        unset($siteConfiguration['Admin']);
+        file_put_contents($configDir . 'settings.json', json_encode($siteConfiguration, JSON_PRETTY_PRINT));
 
         \Cake\Core\Configure::config('default', new \Cake\Core\Configure\Engine\PhpConfig($configDir));
         \Cake\Core\Configure::load('app', 'default', false);
@@ -268,12 +291,25 @@ class CroogoInstaller
         $connection = \Cake\Datasource\ConnectionManager::get('default');
 
         foreach ($schema as $sql) {
-            $connection->query($sql);
+            $connection->query(str_replace(array_keys($replacements), array_values($replacements), $sql));
         }
     }
 
     public function moveFiles()
     {
         $this->recurseCopy($this->tmpDir, dirname($this->installDir));
+    }
+
+    public function runAppInstall()
+    {
+        require $this->tmpDir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Installer.php';
+        require 'ComposerIo.php';
+
+        $io = new ComposerIo();
+
+        \App\Console\Installer::createAppConfig($this->tmpDir, $io);
+        \App\Console\Installer::createWritableDirectories($this->tmpDir, $io);
+        \App\Console\Installer::setFolderPermissions($this->tmpDir, $io);
+        \App\Console\Installer::setSecuritySalt($this->tmpDir, $io);
     }
 }

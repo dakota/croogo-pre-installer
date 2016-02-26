@@ -1,8 +1,9 @@
 <?php
 require "CroogoInstaller.php";
+require "output.php";
 
 $croogoInstaller = new CroogoInstaller();
 
-$output = $croogoInstaller->moveFiles();
+$croogoInstaller->moveFiles();
 
-echo $output;
+output(['ok' => true]);
