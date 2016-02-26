@@ -7,7 +7,6 @@ $croogoInstaller = new CroogoInstaller();
 
 $croogoInstaller->cleanup();
 $output = $croogoInstaller->createProject();
-$croogoInstaller->runAppInstall();
 $croogoInstaller->setMinimumStability();
 $croogoInstaller->addCroogoRequire();
 

@@ -267,8 +267,6 @@ class CroogoInstaller
 
     public function configureSite($data)
     {
-        require $this->tmpDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-
         $siteConfiguration = json_decode(file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'settings.json'), true);
 
         $siteConfiguration['Site']['name'] = $data['site-name'];
@@ -282,20 +280,35 @@ class CroogoInstaller
         $configDir = $this->tmpDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
         file_put_contents($configDir . 'settings.json', json_encode($siteConfiguration, JSON_PRETTY_PRINT));
 
+        $this->runAppInstall();
+
+        $replacements = [
+            '__DBDRIVER__' => $this->databaseDrivers[$data['database-datasource']],
+            '__DBHOST__' => $data['database-host'],
+            '__DBPORT__' => $data['database-port'],
+            '__DBUSER__' => $data['database-username'],
+            '__DBPASSWORD__' => $data['database-password'],
+            '__DBNAME__' => $data['database-database'],
+        ];
+
         if (!file_exists($configDir . 'app.php')) {
-            rename($configDir . 'app.default.php', $configDir . 'app.php');
+            copy(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app.default.php', $configDir . 'app.php');
         }
 
-        \Cake\Core\Configure::config('default', new \Cake\Core\Configure\Engine\PhpConfig($configDir));
-        \Cake\Core\Configure::load('app', 'default', false);
-        \Cake\Core\Configure::write('debug', false);
-        \Cake\Core\Configure::write('Datasources.default.driver', $this->databaseDrivers[$data['database-datasource']]);
-        \Cake\Core\Configure::write('Datasources.default.host', $data['database-host']);
-        \Cake\Core\Configure::write('Datasources.default.port', $data['database-port']);
-        \Cake\Core\Configure::write('Datasources.default.username', $data['database-username']);
-        \Cake\Core\Configure::write('Datasources.default.password', $data['database-password']);
-        \Cake\Core\Configure::write('Datasources.default.database', $data['database-database']);
-        \Cake\Core\Configure::dump('app', 'default');
+        $config = $configDir . 'app.php';
+        $content = file_get_contents($config);
+
+        $content = str_replace(array_keys($replacements), array_values($replacements), $content);
+
+        file_put_contents($config, $content);
+
+        $route = $configDir . 'routes.php';
+        $content = file_get_contents($route);
+
+        $defaultRoute = '$routes->connect(\'/\', [\'controller\' => \'Pages\', \'action\' => \'display\', \'home\']);';
+        $content = str_replace($defaultRoute, '//' . $defaultRoute, $content);
+
+        file_put_contents($route, $content);
     }
 
     public function databaseInstall($data)
@@ -351,6 +364,8 @@ class CroogoInstaller
 
     public function runAppInstall()
     {
+        $this->requireComposer();
+
         require $this->tmpDir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Installer.php';
         require 'ComposerIo.php';
 
