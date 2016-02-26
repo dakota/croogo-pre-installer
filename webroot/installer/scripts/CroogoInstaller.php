@@ -77,6 +77,37 @@ class CroogoInstaller
         return $output;
     }
 
+    /**
+     * Update the applications bootstrap.php file.
+     *
+     * @param string $plugin Name of plugin.
+     * @param bool $hasBootstrap Whether or not bootstrap should be loaded.
+     * @param bool $hasRoutes Whether or not routes should be loaded.
+     * @param bool $hasAutoloader Whether or not there is an autoloader configured for
+     * the plugin.
+     * @return bool If modify passed.
+     */
+    protected function loadPlugin($plugin, $hasBootstrap, $hasRoutes, $hasAutoloader)
+    {
+        $bootstrapFileName = $this->tmpDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'bootstrap.php';;
+        $bootstrap = new \Cake\Filesystem\File($bootstrapFileName, false);
+        $contents = $bootstrap->read();
+        if (!preg_match("@\n\s*Plugin::loadAll@", $contents)) {
+            $autoloadString = $hasAutoloader ? "'autoload' => true" : '';
+            $bootstrapString = $hasBootstrap ? "'bootstrap' => true" : '';
+            $routesString = $hasRoutes ? "'routes' => true" : '';
+
+            $append = "\nPlugin::load('%s', [%s]);\n";
+            $options = implode(', ', array_filter([$autoloadString, $bootstrapString, $routesString]));
+
+            $bootstrap->append(str_replace(', []', '', sprintf($append, $plugin, $options)));
+
+            return true;
+        }
+
+        return false;
+    }
+
     public function createProject()
     {
         if (is_file($this->tmpDir . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller' . DIRECTORY_SEPARATOR . 'AppController.php') && is_file($this->installDir)) {
@@ -139,8 +170,8 @@ class CroogoInstaller
     public function clearDependencies()
     {
         $json = $this->openComposerJson();
-        $json['require'] = new stdClass();
-        $json['require-dev'] = new stdClass();
+        unset($json['require']);
+        unset($json['require-dev']);
         unset($json['scripts']);
         $this->saveComposerJson($json);
     }
@@ -257,6 +288,7 @@ class CroogoInstaller
 
         \Cake\Core\Configure::config('default', new \Cake\Core\Configure\Engine\PhpConfig($configDir));
         \Cake\Core\Configure::load('app', 'default', false);
+        \Cake\Core\Configure::write('debug', false);
         \Cake\Core\Configure::write('Datasources.default.driver', $this->databaseDrivers[$data['database-datasource']]);
         \Cake\Core\Configure::write('Datasources.default.host', $data['database-host']);
         \Cake\Core\Configure::write('Datasources.default.port', $data['database-port']);
@@ -266,7 +298,7 @@ class CroogoInstaller
         \Cake\Core\Configure::dump('app', 'default');
     }
 
-    public function databaseInstall()
+    public function databaseInstall($data)
     {
         require $this->tmpDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
@@ -286,17 +318,34 @@ class CroogoInstaller
         file_put_contents($configDir . 'settings.json', json_encode($siteConfiguration, JSON_PRETTY_PRINT));
 
         \Cake\Core\Configure::config('default', new \Cake\Core\Configure\Engine\PhpConfig($configDir));
+
+        \Cake\Core\Configure::clear();
         \Cake\Core\Configure::load('app', 'default', false);
+        \Cake\Core\Configure::write('Datasources.default.driver', $this->databaseDrivers[$data['database-datasource']]);
+        \Cake\Core\Configure::write('Datasources.default.host', $data['database-host']);
+        \Cake\Core\Configure::write('Datasources.default.port', $data['database-port']);
+        \Cake\Core\Configure::write('Datasources.default.username', $data['database-username']);
+        \Cake\Core\Configure::write('Datasources.default.password', $data['database-password']);
+        \Cake\Core\Configure::write('Datasources.default.database', $data['database-database']);
+
         \Cake\Datasource\ConnectionManager::config(\Cake\Core\Configure::consume('Datasources'));
         $connection = \Cake\Datasource\ConnectionManager::get('default');
 
         foreach ($schema as $sql) {
+            $sql = trim($sql);
+            if (empty($sql)) {
+                continue;
+            }
             $connection->query(str_replace(array_keys($replacements), array_values($replacements), $sql));
         }
     }
 
     public function moveFiles()
     {
+        require $this->tmpDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+        $this->loadPlugin('Acl', true, false, false);
+        $this->loadPlugin('Croogo/Core', true, true, false);
+
         $this->recurseCopy($this->tmpDir, dirname($this->installDir));
     }
 

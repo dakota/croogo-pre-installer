@@ -56,18 +56,22 @@ jQuery(function ($) {
         title: 'Site configuration',
         uri: '/installer/scripts/siteConfiguration.php',
         ajaxOptions: function () {
-          var siteData = $('#database-config').find('form').serializeArray();
-            console.log(siteData);
-          $.extend(siteData, $('#site-details').find('form').serializeArray());
-            console.log(siteData);
+          var databaseData = $('#database-config').find('form').serializeArray();
+          var siteData = $('#site-details').find('form').serializeArray();
+          var allData = databaseData.concat(siteData);
           return {
-            data: siteData, method: 'POST',
+            data: allData, method: 'POST',
           };
         },
       },
       {
         title: 'Database installation',
-        uri: '/installer/scripts/databaseInstall.php',
+        uri: '/installer/scripts/databaseInstall.php', ajaxOptions: function () {
+          var databaseData = $('#database-config').find('form').serializeArray();
+          return {
+            data: databaseData, method: 'POST',
+          };
+      },
       },
       {
         title: 'Move files',
@@ -93,10 +97,11 @@ jQuery(function ($) {
     var $wrapper = $('<div></div>');
     var $listItem = $('<li></li>');
     var $icon = $('<i class="fa fa-spin fa-spinner"></i>');
-    var step = Math.ceil(100 / Object.keys(dependencies).length);
     var currentProgress = 0;
     var uri = '/installer/scripts/installPackage.php';
-    var completed = false;
+    var done = 0;
+    var total = dependencies.length;
+    var step = Math.ceil(100 / total);
 
     $listItem
       .append($icon)
@@ -128,8 +133,9 @@ jQuery(function ($) {
             .val(parseInt(currentProgress, 10))
             .text(currentProgress + '%');
 
-          if (currentProgress >= 100 && completed === false) {
-            completed = true;
+          done++;
+
+          if (done >= total) {
             $wrapper.remove();
             $icon
               .removeClass('fa-spin fa-spinner')

@@ -4,6 +4,6 @@ require "output.php";
 
 $croogoInstaller = new CroogoInstaller();
 
-$croogoInstaller->databaseInstall();
+$croogoInstaller->databaseInstall($_POST);
 
 output(['ok' => true]);
