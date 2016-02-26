@@ -291,10 +291,6 @@ class CroogoInstaller
             '__DBNAME__' => $data['database-database'],
         ];
 
-        if (!file_exists($configDir . 'app.php')) {
-            copy(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app.default.php', $configDir . 'app.php');
-        }
-
         $config = $configDir . 'app.php';
         $content = file_get_contents($config);
 
@@ -371,7 +367,11 @@ class CroogoInstaller
 
         $io = new ComposerIo();
 
-        \App\Console\Installer::createAppConfig($this->tmpDir, $io);
+        $configDir = $this->tmpDir . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+        if (!file_exists($configDir . 'app.php')) {
+            copy(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'app.default.php', $configDir . 'app.php');
+        }
+
         \App\Console\Installer::createWritableDirectories($this->tmpDir, $io);
         \App\Console\Installer::setFolderPermissions($this->tmpDir, $io);
         \App\Console\Installer::setSecuritySalt($this->tmpDir, $io);
