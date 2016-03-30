@@ -227,7 +227,7 @@ $availableDrivers = availableDrivers();
                                         Database password
                                     </label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" id="database-password" name="database-password" required>
+                                        <input type="text" class="form-control" id="database-password" name="database-password">
                                         <small class="text-muted">The password that your host has provided for accessing your
                                             database
                                         </small>
